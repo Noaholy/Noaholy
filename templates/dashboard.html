@@ -1,0 +1,674 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    --danger-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --warning-gradient: linear-gradient(135deg, #ffe985 0%, #fa742b 100%);
+    --card-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    --hover-shadow: 0 20px 60px rgba(0,0,0,0.12);
+}
+
+/* Modern Dashboard Styles */
+.dashboard-header {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.dashboard-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+    color: #6c757d;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+/* Modern Search Bar */
+.modern-search {
+    background: white;
+    border: 2px solid #eef2f6;
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.modern-search:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+}
+
+.modern-search input {
+    border: none;
+    background: transparent;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+    outline: none;
+}
+
+.modern-search input::placeholder {
+    color: #a0aec0;
+    font-weight: 300;
+}
+
+.modern-search i {
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+/* Modern Buttons */
+.btn-modern {
+    border-radius: 50px;
+    padding: 0.9rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-modern:hover::before {
+    left: 100%;
+}
+
+.btn-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.btn-add {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.btn-add i {
+    background: rgba(255,255,255,0.2);
+    padding: 0.3rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+/* Modern Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::after {
+    opacity: 1;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: var(--hover-shadow);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: #718096;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-trend {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+/* Modern Table */
+.modern-table-container {
+    background: white;
+    border-radius: 24px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    margin-top: 2rem;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.modern-table thead th {
+    background: #f8fafc;
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+}
+
+.modern-table tbody tr {
+    background: white;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+}
+
+.modern-table tbody tr:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.modern-table td {
+    padding: 1.2rem 1rem;
+    border: none;
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+.modern-table td:first-child {
+    border-radius: 16px 0 0 16px;
+}
+
+.modern-table td:last-child {
+    border-radius: 0 16px 16px 0;
+}
+
+/* Stock Badge */
+.stock-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.stock-low {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stock-zero {
+    background: linear-gradient(135deg, #ffd1d1 0%, #ff9a9a 100%);
+}
+
+/* Price Tags */
+.price-tag {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.price-tag::before {
+    content: '₱';
+    font-size: 0.8rem;
+    margin-right: 2px;
+    color: #718096;
+}
+
+/* Profit Indicator */
+.profit-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.profit-positive {
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    color: #0b2e4e;
+}
+
+.profit-negative {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+/* Action Buttons */
+.action-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-action::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3748;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.btn-action:hover::after {
+    opacity: 1;
+    bottom: -25px;
+}
+
+.btn-action:hover {
+    transform: translateY(-3px);
+}
+
+.btn-in {
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    box-shadow: 0 4px 15px rgba(132, 250, 176, 0.3);
+}
+
+.btn-out {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #ffe985 0%, #fa742b 100%);
+    box-shadow: 0 4px 15px rgba(255, 233, 133, 0.3);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+}
+
+/* Modern Pagination */
+.modern-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.modern-pagination .page-link {
+    border: none;
+    padding: 0.75rem 1.2rem;
+    border-radius: 12px;
+    color: #4a5568;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.modern-pagination .page-link:hover {
+    background: var(--primary-gradient);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.modern-pagination .active .page-link {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Loading Animation */
+.modern-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background: white;
+    border-radius: 50px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.modern-loading .spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Summary Info */
+.summary-info {
+    background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.summary-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+}
+
+.summary-text {
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.summary-text strong {
+    color: #2d3748;
+    font-weight: 700;
+}
+</style>
+
+<!-- Modern Header -->
+<div class="dashboard-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="dashboard-title">
+                <i class="bi bi-grid-3x3-gap-fill me-3"></i>Stock Dashboard
+            </h1>
+            <p class="dashboard-subtitle">
+                <i class="bi bi-clock-history me-2"></i>Real-time inventory overview & management
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-light text-dark p-3 rounded-4">
+                <i class="bi bi-calendar3 me-2"></i>
+                <!-- Removed 'now' reference that was causing the error -->
+                {% set current_date = '' %}
+                <script>
+                    document.write(new Date().toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    }));
+                </script>
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+{% if items %}
+{% set total_profit = namespace(value=0) %}
+{% set total_sales = namespace(value=0) %}
+{% set low_stock = namespace(count=0) %}
+{% for item in items %}
+    {% set total_profit.value = total_profit.value + item.profit() %}
+    {% set total_sales.value = total_sales.value + item.total_sales_value() %}
+    {% if item.current_stock < 10 %}
+        {% set low_stock.count = low_stock.count + 1 %}
+    {% endif %}
+{% endfor %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-box-seam"></i>
+        </div>
+        <div class="stat-value">{{ items|length }}</div>
+        <div class="stat-label">Total Items</div>
+        <span class="stat-trend">
+            <i class="bi bi-arrow-up me-1"></i>Active
+        </span>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: var(--success-gradient);">
+            <i class="bi bi-graph-up"></i>
+        </div>
+        <div class="stat-value">₱{{ "%.2f"|format(total_profit.value) }}</div>
+        <div class="stat-label">Total Profit</div>
+        <span class="stat-trend" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
+            <i class="bi bi-arrow-up me-1"></i>Revenue
+        </span>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: var(--warning-gradient);">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <div class="stat-value">{{ low_stock.count }}</div>
+        <div class="stat-label">Low Stock Items</div>
+        {% if low_stock.count > 0 %}
+        <span class="stat-trend" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+            <i class="bi bi-exclamation-circle me-1"></i>Need attention
+        </span>
+        {% endif %}
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: var(--danger-gradient);">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+        <div class="stat-value">₱{{ "%.2f"|format(total_sales.value) }}</div>
+        <div class="stat-label">Total Sales</div>
+        <span class="stat-trend" style="background: rgba(23, 162, 184, 0.1); color: #17a2b8;">
+            <i class="bi bi-arrow-up me-1"></i>Income
+        </span>
+    </div>
+</div>
+{% endif %}
+
+<!-- Search and Add Section -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="modern-search d-flex align-items-center">
+            <i class="bi bi-search ms-3"></i>
+            <input type="text" 
+                   id="searchInput" 
+                   placeholder="Search items by name, price, or stock level..." 
+                   value="{{ search or '' }}"
+                   autocomplete="off">
+            <button id="clearSearch" class="btn btn-link text-decoration-none" style="display:none;">
+                <i class="bi bi-x-circle-fill text-danger"></i>
+            </button>
+        </div>
+        <small class="text-muted mt-2 d-block">
+            <i class="bi bi-info-circle me-1"></i>Type to search instantly • Press ESC to clear
+        </small>
+    </div>
+    <div class="col-lg-4">
+        <a href="{{ url_for('add_item') }}" class="btn btn-modern btn-add w-100">
+            <i class="bi bi-plus-circle"></i>
+            <span>Add New Product</span>
+        </a>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="searchLoading" class="d-none text-center mb-4">
+    <div class="modern-loading">
+        <div class="spinner"></div>
+        <span class="text-muted">Searching inventory...</span>
+    </div>
+</div>
+
+<!-- Main Table Container -->
+<div id="table-container">
+    {% include '_dashboard_table.html' %}
+</div>
+
+<script>
+// Your existing JavaScript remains exactly the same
+function debounce(func, delay) {
+    let timer;
+    return function() {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, arguments), delay);
+    };
+}
+
+function loadDashboard(page = 1, searchTerm = '') {
+    const container = document.getElementById('table-container');
+    const loading = document.getElementById('searchLoading');
+
+    loading.classList.remove('d-none');
+    container.classList.add('opacity-50');
+
+    const url = `/dashboard?page=${page}&search=${encodeURIComponent(searchTerm)}&ajax=true`;
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = data.html;
+            container.classList.remove('opacity-50');
+            loading.classList.add('d-none');
+            attachPaginationListeners();
+        })
+        .catch(err => {
+            console.error(err);
+            loading.classList.add('d-none');
+            container.classList.remove('opacity-50');
+        });
+}
+
+function attachPaginationListeners() {
+    document.querySelectorAll('.pagination a[data-page]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.getAttribute('data-page');
+            if (page) {
+                const currentSearch = document.getElementById('searchInput').value.trim();
+                loadDashboard(page, currentSearch);
+            }
+        });
+    });
+}
+
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearSearch');
+
+if (searchInput) {
+    const doSearch = debounce(() => {
+        const term = searchInput.value.trim();
+        loadDashboard(1, term);
+        clearBtn.style.display = term ? 'block' : 'none';
+    }, 400);
+
+    searchInput.addEventListener('input', doSearch);
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        loadDashboard(1, '');
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            loadDashboard(1, '');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    attachPaginationListeners();
+});
+</script>
+
+{% endblock %}

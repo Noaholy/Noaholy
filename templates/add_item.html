@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg border-0 animate-on-load">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-plus-circle-fill text-success me-2"></i>
+                    Add New Item
+                </h4>
+                <p class="text-muted small mt-2 mb-0">Fill in the details to add a new product to your inventory</p>
+            </div>
+            <div class="card-body p-4 p-lg-5">
+                <form method="POST">
+                    <!-- Item Name (full width, prominent) -->
+                    <div class="mb-5">
+                        <label class="form-label fw-bold text-uppercase small tracking-wide">
+                            <i class="bi bi-tag-fill me-2 text-primary"></i>Item Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="name" class="form-control form-control-lg" 
+                               required autofocus 
+                               placeholder="e.g. Paracetamol 500mg, Surgical Gloves, Syringe 5ml..."
+                               style="font-size: 1.2rem; padding: 1rem;">
+                    </div>
+
+                    <!-- Price Row with Live Preview -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase small tracking-wide">
+                                <i class="bi bi-cash-stack me-2 text-success"></i>Buying Price (RWF)
+                            </label>
+                            <input type="number" step="0.01" name="buying_price" id="buying-price"
+                                   class="form-control form-control-lg price-input" 
+                                   value="0.00" min="0" required
+                                   placeholder="0.00">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase small tracking-wide">
+                                <i class="bi bi-cash me-2 text-primary"></i>Selling Price (RWF)
+                            </label>
+                            <input type="number" step="0.01" name="selling_price" id="selling-price"
+                                   class="form-control form-control-lg price-input" 
+                                   value="0.00" min="0" required
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <!-- Live Profit Preview Card -->
+                    <div class="row g-3 mb-5" id="profit-preview" style="display: none;">
+                        <div class="col-12">
+                            <div class="bg-light rounded-4 p-4 border">
+                                <div class="row text-center g-3">
+                                    <div class="col-sm-4">
+                                        <span class="text-muted small text-uppercase d-block mb-2">Profit per unit</span>
+                                        <span id="profit-per-unit" class="h2 fw-bold text-success">0</span>
+                                        <span class="text-muted small d-block">RWF</span>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <span class="text-muted small text-uppercase d-block mb-2">Margin</span>
+                                        <span id="profit-margin" class="h2 fw-bold text-info">0%</span>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <span class="text-muted small text-uppercase d-block mb-2">Markup</span>
+                                        <span id="profit-markup" class="h2 fw-bold text-primary">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Initial Stock (optional but helpful) -->
+                    <div class="mb-5">
+                        <label class="form-label fw-bold text-uppercase small tracking-wide">
+                            <i class="bi bi-box-seam me-2 text-warning"></i>Initial Stock
+                        </label>
+                        <div class="input-group">
+                            <input type="number" name="opening_stock" id="opening-stock"
+                                   class="form-control form-control-lg" 
+                                   value="0" min="0" placeholder="0">
+                            <span class="input-group-text bg-light">units</span>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Current stock will start with this value. You can add more later.
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-3 d-md-flex">
+                        <button type="submit" class="btn btn-success btn-lg px-5 py-3 flex-grow-1">
+                            <i class="bi bi-check-circle me-2"></i>Add Item
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg px-5 py-3">
+                            <i class="bi bi-arrow-left me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const buyingInput = document.getElementById('buying-price');
+        const sellingInput = document.getElementById('selling-price');
+        const profitPreview = document.getElementById('profit-preview');
+        const profitPerUnit = document.getElementById('profit-per-unit');
+        const profitMargin = document.getElementById('profit-margin');
+        const profitMarkup = document.getElementById('profit-markup');
+
+        function formatNumber(num) {
+            return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function updatePreview() {
+            const buying = parseFloat(buyingInput.value) || 0;
+            const selling = parseFloat(sellingInput.value) || 0;
+            
+            // Show preview if both prices are entered and at least one is > 0
+            if ((buying > 0 || selling > 0) && buyingInput.value && sellingInput.value) {
+                profitPreview.style.display = 'block';
+                
+                const profit = selling - buying;
+                const margin = buying > 0 ? (profit / buying * 100) : (selling > 0 ? 100 : 0);
+                const markup = buying > 0 ? ((selling - buying) / buying * 100) : 0;
+
+                // Profit per unit with color
+                profitPerUnit.textContent = formatNumber(profit);
+                profitPerUnit.className = profit >= 0 ? 'h2 fw-bold text-success' : 'h2 fw-bold text-danger';
+                
+                // Margin with color
+                profitMargin.textContent = margin.toFixed(1) + '%';
+                profitMargin.className = margin >= 0 ? 'h2 fw-bold text-info' : 'h2 fw-bold text-danger';
+                
+                // Markup (always positive if selling > buying)
+                profitMarkup.textContent = markup.toFixed(1) + '%';
+                profitMarkup.className = markup >= 0 ? 'h2 fw-bold text-primary' : 'h2 fw-bold text-danger';
+            } else {
+                profitPreview.style.display = 'none';
+            }
+        }
+
+        buyingInput.addEventListener('input', updatePreview);
+        sellingInput.addEventListener('input', updatePreview);
+        
+        // Initial check (in case of pre-filled values)
+        updatePreview();
+    })();
+</script>
+
+<style>
+    /* Additional custom styles for better visual hierarchy */
+    .tracking-wide {
+        letter-spacing: 0.5px;
+    }
+    
+    .price-input {
+        font-size: 1.3rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    
+    .price-input:focus {
+        transform: scale(1.02);
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+    }
+    
+    #profit-preview {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .input-group-text {
+        border-radius: 0 12px 12px 0;
+        border: 2px solid #e9ecef;
+        border-left: none;
+        background: white;
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .input-group .form-control {
+        border-radius: 12px 0 0 12px;
+        border-right: none;
+    }
+    
+    .input-group .form-control:focus + .input-group-text {
+        border-color: #198754;
+        border-left: none;
+    }
+</style>
+{% endblock %}

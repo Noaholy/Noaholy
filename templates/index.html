@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero d-flex align-items-center" style="
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+    background-size: 200% 200%;
+    color: white;
+    position: relative;
+    overflow: hidden;
+">
+    <!-- Background overlay pattern -->
+    <div style="
+        position: absolute;
+        inset: 0;
+        background: url('https://www.transparenttextures.com/patterns/medical.png') repeat;
+        opacity: 0.08;
+    "></div>
+
+    <div class="container position-relative z-1">
+        <div class="row align-items-center g-5">
+            <!-- Left side - Text & CTA -->
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4 animate-on-load delay-1">
+                    Medical Stock Management
+                </h1>
+                <p class="lead fs-4 mb-5 opacity-90 animate-on-load delay-2">
+                    Simple, reliable, and efficient inventory system for pharmacies, clinics, and dispensaries.<br>
+                    Track stock in real-time, manage entries & exits, calculate profits, and export reports — all in one place.
+                </p>
+
+                <div class="d-flex flex-column flex-sm-row gap-3 animate-on-load delay-3">
+                    <!-- Primary CTA: Dashboard -->
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg px-5 py-3 fw-bold shadow-lg">
+                        <i class="bi bi-grid-3x3-gap-fill me-2"></i> Go to Dashboard
+                    </a>
+                    <!-- Secondary CTA: Live Stock -->
+                    <a href="{{ url_for('live_stock') }}" class="btn btn-outline-light btn-lg px-5 py-3 fw-bold">
+                        <i class="bi bi-camera-reels me-2"></i> View Live Stock
+                    </a>
+                </div>
+
+                <div class="mt-5 pt-4 small opacity-75 animate-on-load delay-3">
+                    Built for clinics & pharmacies in Rwanda • Secure • Easy to use
+                </div>
+            </div>
+
+            <!-- Right side - Visual / Illustration -->
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/2785/2785482.png"
+                     alt="Medical inventory"
+                     class="img-fluid hero-illustration"
+                     style="max-height: 500px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Features Section -->
+<section id="features" class="py-5 bg-light">
+    <div class="container py-5">
+        <h2 class="text-center fw-bold mb-5 animate-on-load">Why Use This System?</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-4 animate-on-load delay-1">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-5">
+                        <i class="bi bi-speedometer2 display-1 text-primary mb-4"></i>
+                        <h4>Real-time Tracking</h4>
+                        <p class="text-muted">Instant updates on stock levels, entries, and outs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 animate-on-load delay-2">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-5">
+                        <i class="bi bi-calculator display-1 text-success mb-4"></i>
+                        <h4>Profit & Valuation</h4>
+                        <p class="text-muted">See total stock value and potential profit instantly</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 animate-on-load delay-3">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-5">
+                        <i class="bi bi-file-earmark-spreadsheet display-1 text-info mb-4"></i>
+                        <h4>Excel Export</h4>
+                        <p class="text-muted">Download reports in familiar format anytime</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer CTA with both options -->
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container py-4">
+        <h3 class="mb-4 animate-on-load">Ready to manage your stock smarter?</h3>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg px-5 py-3 fw-bold animate-on-load delay-1">
+                <i class="bi bi-grid-3x3-gap-fill me-2"></i> Go to Dashboard
+            </a>
+            <a href="{{ url_for('live_stock') }}" class="btn btn-outline-light btn-lg px-5 py-3 fw-bold animate-on-load delay-2">
+                <i class="bi bi-camera-reels me-2"></i> View Live Stock
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

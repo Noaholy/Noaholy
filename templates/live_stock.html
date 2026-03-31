@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedStock • Live Pharmacy Inventory Kigali</title>
+  <!-- Tailwind + Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    body { background: #fafaf9; color: #1e1e1e; transition: background-color 0.2s ease, color 0.2s ease; }
+    
+    /* dark mode variables */
+    body.dark {
+      background: #121212;
+      color: #e5e5e5;
+    }
+
+    /* smooth card animation */
+    .card-transition {
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, background-color 0.2s;
+      cursor: pointer;
+    }
+    .card-transition:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 30px 40px -15px rgba(0, 80, 60, 0.3);
+    }
+    body.dark .card-transition:hover {
+      box-shadow: 0 30px 40px -15px rgba(0, 200, 150, 0.2);
+    }
+    
+    /* custom stock badges & animations */
+    .stock-high { color: #0b7b4f; }
+    .stock-med { color: #b6560b; }
+    .stock-low { 
+      color: #b91c1c; 
+      animation: softPulse 1.8s infinite; 
+    }
+    body.dark .stock-high { color: #34d399; }
+    body.dark .stock-med { color: #fbbf24; }
+    body.dark .stock-low { color: #f87171; }
+
+    @keyframes softPulse {
+      0% { opacity: 1; text-shadow: 0 0 0 rgba(185, 28, 28, 0.2); }
+      50% { opacity: 0.85; text-shadow: 0 0 10px rgba(185, 28, 28, 0.5); }
+      100% { opacity: 1; text-shadow: 0 0 0 rgba(185, 28, 28, 0); }
+    }
+
+    /* live dot pulse */
+    .live-dot {
+      animation: livePulse 1.5s infinite;
+      box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5);
+    }
+    @keyframes livePulse {
+      0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+    }
+
+    /* glass modal background */
+    .backdrop-glass {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    body.dark .backdrop-glass {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    /* smooth anchor scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* focus ring */
+    .focus-ring-emerald:focus {
+      outline: none;
+      border-color: #0f6e4a;
+      box-shadow: 0 0 0 4px rgba(4, 120, 87, 0.2);
+    }
+
+    /* ----- dark mode overrides ----- */
+    body.dark .bg-white, 
+    body.dark .bg-zinc-50,
+    body.dark .bg-white\/80,
+    body.dark .bg-zinc-100,
+    body.dark .bg-emerald-50,
+    body.dark .bg-emerald-50\/50,
+    body.dark .bg-zinc-50\/90 {
+      background-color: #1e1e1e !important;
+      background-image: none;
+      border-color: #333 !important;
+    }
+    body.dark .bg-emerald-100 {
+      background-color: #1e3a2e !important;
+      color: #cbd5c0;
+    }
+    body.dark .border-zinc-200,
+    body.dark .border-zinc-100,
+    body.dark .border-emerald-200\/70,
+    body.dark .border-emerald-200\/60,
+    body.dark .border-zinc-200\/80 {
+      border-color: #333 !important;
+    }
+    body.dark .text-zinc-900,
+    body.dark .text-zinc-800,
+    body.dark .text-zinc-700,
+    body.dark .text-emerald-800 {
+      color: #f0f0f0 !important;
+    }
+    body.dark .text-zinc-600,
+    body.dark .text-zinc-500,
+    body.dark .text-zinc-400 {
+      color: #aaa !important;
+    }
+    body.dark .text-emerald-700,
+    body.dark .text-emerald-600 {
+      color: #6ee7b7 !important;
+    }
+    body.dark .bg-emerald-600 {
+      background-color: #0b5e42 !important;
+    }
+    body.dark .bg-emerald-50\/70 {
+      background-color: #1a2a22 !important;
+    }
+    body.dark .shadow-lg {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
+    }
+    body.dark input, body.dark textarea {
+      background-color: #2a2a2a !important;
+      border-color: #444 !important;
+      color: #eee !important;
+    }
+    body.dark input::placeholder, body.dark textarea::placeholder {
+      color: #777 !important;
+    }
+    body.dark .bg-emerald-50:hover {
+      background-color: #2a4a3a !important;
+    }
+    body.dark footer, body.dark .bg-white\/95 {
+      background-color: #1a1a1a !important;
+      border-color: #333 !important;
+    }
+    body.dark .bg-zinc-100 {
+      background-color: #2c2c2c !important;
+    }
+    body.dark .text-emerald-800 {
+      color: #a7f3d0 !important;
+    }
+
+    /* AI chat sidebar styles */
+    #ai-sidebar {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 380px;
+      height: 100vh;
+      background: white;
+      box-shadow: -5px 0 30px rgba(0,0,0,0.15);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    body.dark #ai-sidebar {
+      background: #1e1e1e;
+      border-left: 1px solid #333;
+    }
+    #ai-sidebar.open {
+      right: 0;
+    }
+    #ai-toggle {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0f6e4a, #0a5a3c);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0,100,80,0.4);
+      cursor: pointer;
+      z-index: 999;
+      transition: all 0.2s;
+      border: 3px solid white;
+    }
+    body.dark #ai-toggle {
+      background: #1e4a3a;
+      border-color: #333;
+    }
+    #ai-toggle:hover {
+      transform: scale(1.1) rotate(5deg);
+      background: #0b5e42;
+    }
+    #ai-toggle i {
+      font-size: 28px;
+    }
+    .chat-msg-user {
+      background: #e6f7f0;
+      align-self: flex-end;
+      border-radius: 18px 18px 4px 18px;
+    }
+    body.dark .chat-msg-user {
+      background: #1e4a3a;
+      color: #fff;
+    }
+    .chat-msg-bot {
+      background: #f0f0f0;
+      align-self: flex-start;
+      border-radius: 18px 18px 18px 4px;
+    }
+    body.dark .chat-msg-bot {
+      background: #2a2a2a;
+      color: #ddd;
+    }
+    .chat-msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      margin: 6px 0;
+      word-wrap: break-word;
+    }
+
+    /* toast notification */
+    #toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: white;
+      color: #0f6e4a;
+      padding: 14px 28px;
+      border-radius: 60px;
+      box-shadow: 0 15px 35px -8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      z-index: 1100;
+      transition: transform 0.3s ease;
+      border: 1px solid rgba(4,120,87,0.2);
+      max-width: 90%;
+    }
+    body.dark #toast {
+      background: #2a2a2a;
+      color: #a7f3d0;
+      border-color: #333;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    #toast i {
+      font-size: 22px;
+      color: #0f6e4a;
+    }
+    body.dark #toast i {
+      color: #6ee7b7;
+    }
+
+    /* Hero section animation */
+    .hero-fade-in {
+      animation: fadeInUp 1s ease-out;
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Swiper custom styles */
+    .swiper-pagination-bullet-active {
+      background: #0f6e4a !important;
+    }
+    .swiper-button-next, .swiper-button-prev {
+      color: #0f6e4a !important;
+    }
+    
+    /* Floating animation for badges */
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* Product image styling */
+    .product-image-container {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #f8fafc, #e9ecef);
+    }
+    body.dark .product-image-container {
+      background: linear-gradient(145deg, #2a2a2a, #1e1e1e);
+    }
+    .product-image {
+      max-height: 140px;
+      max-width: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    .card-transition:hover .product-image {
+      transform: scale(1.08);
+    }
+
+    /* Detail modal styles */
+    #detail-modal .modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .detail-image {
+      max-height: 200px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+  <!-- Toast notification container -->
+  <div id="toast">
+    <i class="fa-regular fa-circle-check"></i>
+    <span id="toast-message">Item added to cart</span>
+  </div>
+
+  <!-- ========== STICKY HEADER ========== -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/30 shadow-xs transition-colors">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between">
+      <!-- logo + brand with animation -->
+      <div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='/'">
+        <div class="w-12 h-12 bg-gradient-to-br from-emerald-700 to-teal-600 rounded-xl flex items-center justify-center text-2xl shadow-md transition-all group-hover:scale-110 group-hover:rotate-3">
+          <span class="drop-shadow-md">🩺</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-emerald-800 to-teal-700 bg-clip-text text-transparent">MedStock</h1>
+          <p class="text-[11px] leading-tight text-emerald-600/80 tracking-wide flex items-center gap-1">
+            <span class="live-dot w-2 h-2 bg-emerald-600 rounded-full inline-block"></span>
+            Kigali · 24/7 live
+          </p>
+        </div>
+      </div>
+
+      <!-- desktop nav with hover effect -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="{{ url_for('live_stock') }}" class="text-emerald-700 border-b-2 border-emerald-500 pb-1 px-0.5 transition-all hover:border-emerald-700 hover:text-emerald-800">Live stock</a>
+        <a href="#about" class="text-zinc-500 hover:text-zinc-800 transition-all hover:scale-105 px-0.5">About</a>
+        <a href="#contact" class="text-zinc-500 hover:text-zinc-800 transition-all hover:scale-105 px-0.5">Contact</a>
+        <a href="#advertisement" class="text-zinc-500 hover:text-zinc-800 transition-all hover:scale-105 px-0.5">Offers</a>
+      </nav>
+
+      <!-- right zone: live badge + theme toggle + cart -->
+      <div class="flex items-center gap-3 sm:gap-5">
+        <button id="theme-toggle" class="p-2.5 text-emerald-700 hover:text-emerald-900 transition bg-emerald-50/50 rounded-xl hover:bg-emerald-100 text-xl" aria-label="Toggle dark mode">
+          <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
+        <div class="hidden sm:flex items-center gap-2 bg-emerald-50/70 backdrop-blur-sm text-emerald-800 text-xs font-semibold px-4 py-2 rounded-full border border-emerald-200/60 shadow-inner float-animation">
+          <span class="live-dot w-2.5 h-2.5 bg-emerald-600 rounded-full"></span>
+          <span>LIVE · updating</span>
+        </div>
+        <!-- cart icon with bubble and animation -->
+        <button id="cart-btn" class="relative p-2.5 text-emerald-700 hover:text-emerald-900 transition bg-emerald-50/50 rounded-xl hover:bg-emerald-100 group">
+          <i class="fa-solid fa-bag-shopping text-xl group-hover:scale-110 transition"></i>
+          <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 shadow-md hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== HERO SECTION ========== -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-gray-900 dark:to-gray-800 py-16 md:py-24">
+    <!-- Animated background pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-emerald-400 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-teal-400 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <!-- Left content -->
+        <div class="hero-fade-in">
+          <div class="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800 backdrop-blur-sm text-emerald-800 dark:text-emerald-300 text-sm font-medium px-5 py-2 rounded-full border border-emerald-200/60 shadow-sm mb-6">
+            <span class="live-dot w-2.5 h-2.5 bg-emerald-600 rounded-full"></span>
+            <span>Real‑time pharmacy stock · Kigali</span>
+          </div>
+          <h1 class="text-5xl md:text-6xl font-bold text-zinc-900 dark:text-white tracking-tight leading-tight mb-6">
+            Your Health,<br>Our <span class="text-emerald-600 dark:text-emerald-400">Priority</span>
+          </h1>
+          <p class="text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-lg">
+            Access live medical stock from pharmacies across Kigali. Check availability, compare prices, and order instantly via WhatsApp.
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a href="#stock-grid" class="btn-primary bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-4 rounded-xl shadow-lg shadow-emerald-200/50 dark:shadow-emerald-900/30 transition-all hover:scale-105 flex items-center gap-2">
+              <i class="fa-solid fa-cubes"></i> Browse Stock
+            </a>
+            <a href="#how-it-works" class="bg-white dark:bg-gray-800 text-zinc-700 dark:text-zinc-200 font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center gap-2 border border-zinc-200 dark:border-gray-700">
+              <i class="fa-regular fa-circle-play"></i> How it works
+            </a>
+          </div>
+          <div class="flex items-center gap-6 mt-8">
+            <div class="flex -space-x-3">
+              <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800" alt="user">
+              <img src="https://randomuser.me/api/portraits/men/46.jpg" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800" alt="user">
+              <img src="https://randomuser.me/api/portraits/women/68.jpg" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800" alt="user">
+            </div>
+            <span class="text-sm text-zinc-500 dark:text-zinc-400"><span class="font-bold text-emerald-600 dark:text-emerald-400">500+</span> orders this week</span>
+          </div>
+        </div>
+        <!-- Right image with floating elements -->
+        <div class="relative hero-fade-in" style="animation-delay: 0.2s;">
+          <div class="relative z-10">
+            <img src="https://img.freepik.com/free-vector/pharmacists-abstract-concept-illustration_335657-3876.jpg" alt="Medical inventory" class="rounded-3xl shadow-2xl w-full object-cover">
+          </div>
+          <!-- Floating badges -->
+          <div class="absolute -top-4 -left-4 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 flex items-center gap-3 animate-bounce">
+            <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+              <i class="fa-solid fa-truck-fast text-emerald-600 dark:text-emerald-400 text-xl"></i>
+            </div>
+            <div>
+              <p class="font-bold text-sm">Free delivery</p>
+              <p class="text-xs text-zinc-500">Kigali city</p>
+            </div>
+          </div>
+          <div class="absolute -bottom-4 -right-4 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 flex items-center gap-3 animate-bounce" style="animation-delay: 0.5s;">
+            <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+              <i class="fa-solid fa-clock text-emerald-600 dark:text-emerald-400 text-xl"></i>
+            </div>
+            <div>
+              <p class="font-bold text-sm">24/7 Live</p>
+              <p class="text-xs text-zinc-500">Real-time updates</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ADVERTISEMENT CAROUSEL SECTION ========== -->
+  <section id="advertisement" class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+    <div class="text-center mb-10">
+      <span class="text-emerald-600 dark:text-emerald-400 font-semibold text-sm uppercase tracking-wider">Sponsored</span>
+      <h2 class="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white mt-2">Special Offers</h2>
+      <p class="text-zinc-600 dark:text-zinc-400 mt-3 max-w-2xl mx-auto">Exclusive deals from our partner pharmacies</p>
+    </div>
+    
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        <!-- Slide 1 -->
+        <div class="swiper-slide">
+          <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 shadow-xl">
+            <div class="w-32 h-32 bg-white dark:bg-gray-600 rounded-2xl flex items-center justify-center text-6xl shadow-lg">
+              💊
+            </div>
+            <div class="flex-1 text-center md:text-left">
+              <span class="text-sm font-bold text-amber-600 bg-amber-100 dark:bg-amber-900/30 px-3 py-1 rounded-full">20% OFF</span>
+              <h3 class="text-2xl font-bold mt-3">Paracetamol 500mg</h3>
+              <p class="text-zinc-600 dark:text-zinc-300 mt-2">Buy 2 packs get 1 free • Limited time</p>
+              <button class="mt-4 bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-xl transition-all hover:scale-105">
+                Shop now <i class="fa-solid fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="swiper-slide">
+          <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 shadow-xl">
+            <div class="w-32 h-32 bg-white dark:bg-gray-600 rounded-2xl flex items-center justify-center text-6xl shadow-lg">
+              🧤
+            </div>
+            <div class="flex-1 text-center md:text-left">
+              <span class="text-sm font-bold text-blue-600 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full">BUNDLE</span>
+              <h3 class="text-2xl font-bold mt-3">Surgical Gloves (100pcs)</h3>
+              <p class="text-zinc-600 dark:text-zinc-300 mt-2">Buy 3 boxes at price of 2</p>
+              <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition-all hover:scale-105">
+                Shop now <i class="fa-solid fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="swiper-slide">
+          <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 shadow-xl">
+            <div class="w-32 h-32 bg-white dark:bg-gray-600 rounded-2xl flex items-center justify-center text-6xl shadow-lg">
+              💉
+            </div>
+            <div class="flex-1 text-center md:text-left">
+              <span class="text-sm font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full">FREE SHIPPING</span>
+              <h3 class="text-2xl font-bold mt-3">Insulin Syringes</h3>
+              <p class="text-zinc-600 dark:text-zinc-300 mt-2">On orders above 50,000 RWF</p>
+              <button class="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-xl transition-all hover:scale-105">
+                Shop now <i class="fa-solid fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Navigation buttons -->
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section id="how-it-works" class="bg-white dark:bg-gray-900 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-12">
+        <span class="text-emerald-600 dark:text-emerald-400 font-semibold text-sm uppercase tracking-wider">Simple process</span>
+        <h2 class="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white mt-2">How It Works</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center group">
+          <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 group-hover:scale-110 transition-all group-hover:rotate-3">
+            🔍
+          </div>
+          <h3 class="text-xl font-bold mb-2">1. Search & Browse</h3>
+          <p class="text-zinc-600 dark:text-zinc-400">Find medicines and supplies in real-time</p>
+        </div>
+        <div class="text-center group">
+          <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 group-hover:scale-110 transition-all group-hover:rotate-3">
+            🛒
+          </div>
+          <h3 class="text-xl font-bold mb-2">2. Add to Cart</h3>
+          <p class="text-zinc-600 dark:text-zinc-400">Select items and adjust quantities</p>
+        </div>
+        <div class="text-center group">
+          <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 group-hover:scale-110 transition-all group-hover:rotate-3">
+            📱
+          </div>
+          <h3 class="text-xl font-bold mb-2">3. Order via WhatsApp</h3>
+          <p class="text-zinc-600 dark:text-zinc-400">Send your order and confirm delivery</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MAIN CONTENT (STOCK GRID WITH IMAGES) ========== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-16" id="stock-grid">
+
+    <!-- headline with subtle icon -->
+    <div class="text-center mb-12 space-y-3">
+      <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 text-sm font-medium px-5 py-2 rounded-full border border-emerald-200/60 shadow-sm">
+        <i class="fa-solid fa-cubes text-emerald-600"></i>
+        <span>Real‑time pharmacy stock · Kigali</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white tracking-tight leading-tight">
+        What’s on the shelves<span class="text-emerald-600">?</span>
+      </h2>
+      <p class="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto text-base md:text-lg">
+        Click on any item to see details, usage instructions, and how it works.
+      </p>
+    </div>
+
+    <!-- search bar with animation -->
+    <div class="max-w-xl mx-auto mb-16">
+      <div class="relative group">
+        <input id="search" type="text" onkeyup="filterItems()" 
+               placeholder="Search medicine or supply (e.g. Paracetamol, Gloves...)" 
+               class="w-full bg-white dark:bg-gray-800 border border-zinc-200 dark:border-gray-700 rounded-2xl py-5 pl-6 pr-14 text-base shadow-lg shadow-zinc-200/30 dark:shadow-gray-900/30 focus:shadow-xl transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100/80 outline-none">
+        <i class="fa-solid fa-magnifying-glass absolute right-5 top-1/2 -translate-y-1/2 text-xl text-zinc-400 group-focus-within:text-emerald-600 transition-colors pointer-events-none"></i>
+      </div>
+    </div>
+
+    <!-- stock grid with images -->
+    <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-7 auto-rows-fr">
+      {% if items %}
+        {% for item in items %}
+          <!-- PROFESSIONAL CARD WITH IMAGE -->
+          <div class="card-transition bg-white dark:bg-gray-800 rounded-3xl border border-zinc-100/80 dark:border-gray-700 shadow-lg shadow-zinc-200/40 dark:shadow-gray-900/40 flex flex-col relative overflow-hidden group/card" 
+               data-name="{{ item.name.lower() }}"
+               onclick="openDetailModal('{{ item.id }}', '{{ item.name | e }}', '{{ item.unit or 'Unit' }}', {{ item.current_stock | default(0) }}, {{ item.unit_selling_price | default(0) }}, {{ item.unit_buying_price | default(0) }}, '{{ item.icon or '💊' }}')">
+            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 opacity-80 group-hover/card:opacity-100 transition-opacity"></div>
+            
+            <!-- Discount badge simulation (optional) -->
+            {% if item.current_stock < 80 and item.current_stock > 20 %}
+            <div class="absolute top-4 right-4 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full z-10 shadow-lg">
+              <i class="fa-solid fa-tag mr-1"></i> HOT
+            </div>
+            {% endif %}
+            
+            <div class="p-6 flex flex-col flex-1">
+              <!-- Image container instead of icon -->
+              <div class="product-image-container mb-4">
+                <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
+                     alt="{{ item.name }}" 
+                     class="product-image"
+                     onerror="this.src='https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
+              </div>
+              
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="text-xl font-semibold text-zinc-900 dark:text-white leading-tight">{{ item.name }}</h3>
+                {% if item.current_stock < 80 and item.current_stock > 0 %}
+                  <span class="bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-[11px] font-bold px-2 py-1 rounded-full border border-amber-200/70 flex items-center gap-1 ml-2">
+                    <i class="fa-solid fa-circle-exclamation text-[10px]"></i> low
+                  </span>
+                {% elif item.current_stock == 0 %}
+                  <span class="bg-zinc-100 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 text-[11px] font-bold px-2 py-1 rounded-full border border-zinc-200/70 flex items-center gap-1 ml-2">
+                    <i class="fa-regular fa-circle-xmark"></i> out
+                  </span>
+                {% endif %}
+              </div>
+              
+              <p class="text-sm text-emerald-600 dark:text-emerald-400 font-medium mb-3">{{ item.unit or 'Unit' }}</p>
+              
+              <div class="mt-auto flex items-end justify-between border-t border-dashed border-zinc-200 dark:border-gray-700 pt-4">
+                <div>
+                  <p class="text-[11px] tracking-wider text-zinc-400 dark:text-zinc-500 uppercase font-medium">In stock</p>
+                  <p class="text-3xl font-bold leading-none {% if item.current_stock > 300 %}stock-high{% elif item.current_stock > 80 %}stock-med{% else %}stock-low{% endif %}">
+                    {{ item.current_stock | default(0) }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="text-[11px] tracking-wider text-zinc-400 dark:text-zinc-500 uppercase font-medium">Price</p>
+                  <p class="text-2xl font-bold text-emerald-700 dark:text-emerald-400 leading-none">
+                    {{ (item.unit_selling_price | default(0)) | round(0) | int }} <span class="text-xs font-medium text-emerald-500 dark:text-emerald-500">RWF</span>
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Add to cart button (separate from card click) -->
+              <div class="mt-4" onclick="event.stopPropagation()">
+                {% if item.current_stock > 0 %}
+                  <button 
+                    onclick="addToCart('{{ item.id }}', '{{ item.name | e }}', {{ item.unit_selling_price | default(0) }}, '{{ item.unit or 'Unit' | e }}'); event.stopPropagation();"
+                    class="w-full bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 border border-emerald-200/70 dark:border-emerald-800/50 group/btn hover:border-emerald-300 shadow-sm text-sm">
+                    <i class="fa-solid fa-cart-plus text-emerald-600 dark:text-emerald-400 text-base group-hover/btn:scale-110 transition"></i>
+                    <span>Add to cart</span>
+                  </button>
+                {% else %}
+                  <button disabled class="w-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 font-medium py-3 px-4 rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-zinc-200/80 dark:border-zinc-700 text-sm">
+                    <i class="fa-regular fa-clock"></i> Out of stock
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-span-full flex flex-col items-center py-20 text-zinc-400 bg-white/50 dark:bg-gray-800/50 rounded-3xl border border-dashed border-zinc-200 dark:border-gray-700">
+          <i class="fa-solid fa-boxes-packing text-6xl mb-5 opacity-40"></i>
+          <p class="text-xl font-medium text-zinc-500 dark:text-zinc-400">No items in stock right now</p>
+          <p class="text-sm">Check back later or contact us</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <!-- ========== DETAIL MODAL (Medicine Information) ========== -->
+  <div id="detail-modal" class="fixed inset-0 backdrop-glass flex items-center justify-center z-50 hidden transition-all duration-300">
+    <div class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-2xl rounded-3xl max-w-2xl w-full mx-4 max-h-[90vh] shadow-2xl border border-white/30 dark:border-gray-700 overflow-hidden modal-content">
+      <!-- Header with image -->
+      <div class="relative h-48 bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
+        <img id="detail-image" src="" alt="Medicine" class="detail-image max-h-36 object-contain">
+        <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white text-xl transition">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-8 overflow-y-auto">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h2 id="detail-name" class="text-3xl font-bold text-zinc-900 dark:text-white"></h2>
+            <p id="detail-unit" class="text-emerald-600 dark:text-emerald-400 font-medium mt-1"></p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-zinc-500 dark:text-zinc-400">Price</p>
+            <p id="detail-price" class="text-3xl font-bold text-emerald-700 dark:text-emerald-400"></p>
+          </div>
+        </div>
+        
+        <!-- Stock status -->
+        <div class="flex items-center gap-3 mb-6">
+          <div class="bg-zinc-100 dark:bg-gray-700 rounded-full px-4 py-2">
+            <span class="text-sm font-medium">In stock: <span id="detail-stock" class="font-bold"></span> units</span>
+          </div>
+          <div id="detail-stock-badge" class="rounded-full px-4 py-2 text-sm font-medium"></div>
+        </div>
+        
+        <!-- Tabs for information -->
+        <div class="border-b border-zinc-200 dark:border-gray-700 mb-6">
+          <div class="flex gap-6">
+            <button class="tab-btn active px-1 py-2 text-emerald-600 dark:text-emerald-400 font-medium border-b-2 border-emerald-600" data-tab="description">Description</button>
+            <button class="tab-btn px-1 py-2 text-zinc-500 dark:text-zinc-400 font-medium hover:text-zinc-700 dark:hover:text-zinc-300" data-tab="usage">Usage</button>
+            <button class="tab-btn px-1 py-2 text-zinc-500 dark:text-zinc-400 font-medium hover:text-zinc-700 dark:hover:text-zinc-300" data-tab="mechanism">How it works</button>
+          </div>
+        </div>
+        
+        <!-- Tab content -->
+        <div id="tab-description" class="tab-content">
+          <p class="text-zinc-600 dark:text-zinc-300 leading-relaxed">
+            <span id="desc-name"></span> is a trusted medication used to relieve pain and reduce fever. 
+            It is commonly prescribed for headaches, muscle aches, arthritis, backaches, toothaches, colds, and fevers.
+          </p>
+          <div class="mt-4 bg-emerald-50 dark:bg-gray-700/50 rounded-xl p-4">
+            <p class="text-sm font-medium text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+              <i class="fa-solid fa-circle-check"></i> 
+              Always consult your healthcare provider before taking any medication.
+            </p>
+          </div>
+        </div>
+        
+        <div id="tab-usage" class="tab-content hidden">
+          <h4 class="font-semibold text-zinc-900 dark:text-white mb-2">Recommended Dosage:</h4>
+          <ul class="list-disc pl-5 space-y-2 text-zinc-600 dark:text-zinc-300">
+            <li>Adults and children 12 years and over: 1-2 tablets every 4-6 hours</li>
+            <li>Do not exceed 8 tablets in 24 hours</li>
+            <li>Children under 12: consult a doctor</li>
+            <li>Take with food or milk if stomach upset occurs</li>
+          </ul>
+          <div class="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
+            <p class="text-sm font-medium text-amber-800 dark:text-amber-300 flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              Do not use with other products containing the same active ingredient.
+            </p>
+          </div>
+        </div>
+        
+        <div id="tab-mechanism" class="tab-content hidden">
+          <p class="text-zinc-600 dark:text-zinc-300 leading-relaxed">
+            <span id="mech-name"></span> works by blocking the production of prostaglandins, chemicals in the body 
+            that cause pain, fever, and inflammation. It selectively inhibits COX-2 enzymes while having less effect on COX-1 enzymes, 
+            which helps protect the stomach lining.
+          </p>
+          <div class="mt-6 grid grid-cols-2 gap-4">
+            <div class="bg-zinc-50 dark:bg-gray-700/50 rounded-xl p-4 text-center">
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Onset of action</p>
+              <p class="font-bold text-zinc-900 dark:text-white">30-60 minutes</p>
+            </div>
+            <div class="bg-zinc-50 dark:bg-gray-700/50 rounded-xl p-4 text-center">
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Duration</p>
+              <p class="font-bold text-zinc-900 dark:text-white">4-6 hours</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Add to cart button in modal -->
+        <div class="mt-8 flex gap-3">
+          <button id="modal-add-to-cart" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 px-6 rounded-xl transition-all hover:scale-105 flex items-center justify-center gap-2 shadow-lg">
+            <i class="fa-solid fa-cart-plus"></i> Add to Cart
+          </button>
+          <button onclick="closeDetailModal()" class="px-6 py-4 border border-zinc-200 dark:border-gray-700 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-gray-700 transition">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER (ENHANCED) ========== -->
+  <footer class="bg-white dark:bg-gray-900 border-t border-zinc-200/80 dark:border-gray-800 mt-16 pt-16 pb-8 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <!-- Newsletter Section -->
+      <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-8 mb-12">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h3 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Stay Updated</h3>
+            <p class="text-zinc-600 dark:text-zinc-300">Get notified about new stock and special offers</p>
+          </div>
+          <div class="flex w-full md:w-auto gap-3">
+            <input type="email" placeholder="Your email" class="flex-1 md:w-64 px-5 py-3 rounded-xl border border-zinc-200 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <button class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105">
+              Subscribe
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <!-- About (expanded) -->
+        <div id="about" class="scroll-mt-20 col-span-1 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-2xl">
+              🩺
+            </div>
+            <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400">MedStock</h3>
+          </div>
+          <p class="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed mb-4">
+            Real‑time medical supply visibility platform based in Kigali, Rwanda. Helping clinics and individuals find essential medicines instantly.
+          </p>
+          <div class="flex gap-3">
+            <a href="#" class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-gray-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-gray-700 transition"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-gray-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-gray-700 transition"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-gray-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-gray-700 transition"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <!-- Quick links -->
+        <div>
+          <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400 mb-4">Quick Links</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="{{ url_for('live_stock') }}" class="text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2"><i class="fa-regular fa-circle-right text-emerald-500 text-xs"></i>Live Stock</a></li>
+            <li><a href="#about" class="text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2"><i class="fa-regular fa-circle-right text-emerald-500 text-xs"></i>About Us</a></li>
+            <li><a href="#contact" class="text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2"><i class="fa-regular fa-circle-right text-emerald-500 text-xs"></i>Contact</a></li>
+            <li><a href="#" class="text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2"><i class="fa-regular fa-circle-right text-emerald-500 text-xs"></i>FAQs</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div id="contact">
+          <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400 mb-4">Contact</h3>
+          <ul class="space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
+            <li class="flex items-start gap-3"><i class="fa-regular fa-map-pin text-emerald-600 dark:text-emerald-400 mt-1 w-4"></i><span>KG 123 St, Kigali Heights<br>Kigali, Rwanda</span></li>
+            <li class="flex items-center gap-3"><i class="fa-regular fa-phone text-emerald-600 dark:text-emerald-400 w-4"></i><a href="tel:+250782426681" class="hover:text-emerald-700 dark:hover:text-emerald-400">+250 782 426 681</a></li>
+            <li class="flex items-center gap-3"><i class="fa-regular fa-envelope text-emerald-600 dark:text-emerald-400 w-4"></i><a href="mailto:info@medstock.rw" class="hover:text-emerald-700 dark:hover:text-emerald-400">info@medstock.rw</a></li>
+          </ul>
+        </div>
+
+        <!-- Hours & Badge -->
+        <div>
+          <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400 mb-4">Hours</h3>
+          <ul class="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <li class="flex items-center gap-3"><i class="fa-regular fa-clock text-emerald-600 dark:text-emerald-400"></i><span>Mon–Fri: 8:00 – 20:00</span></li>
+            <li class="flex items-center gap-3"><i class="fa-regular fa-clock text-emerald-600 dark:text-emerald-400"></i><span>Saturday: 9:00 – 18:00</span></li>
+            <li class="flex items-center gap-3"><i class="fa-regular fa-clock text-emerald-600 dark:text-emerald-400"></i><span>Sunday: Closed</span></li>
+          </ul>
+          <div class="mt-6 bg-emerald-50/70 dark:bg-gray-800 p-4 rounded-2xl border border-emerald-100/60 dark:border-gray-700">
+            <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Healthcare you can trust</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-500 mt-1">Verified suppliers · Temperature controlled</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="border-t border-zinc-200/70 dark:border-gray-800 mt-12 pt-8 text-center text-xs text-zinc-500 dark:text-zinc-500 flex flex-col sm:flex-row justify-between items-center">
+        <span>© 2026 MedStock — Kigali, Rwanda. All rights reserved.</span>
+        <span class="flex gap-4 mt-2 sm:mt-0">
+          <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400">Terms</a>
+          <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400">Privacy</a>
+          <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400">Cookies</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== CART MODAL ========== -->
+  <div id="cart-modal" class="fixed inset-0 backdrop-glass flex items-center justify-center z-50 hidden transition-all duration-300">
+    <div class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-2xl rounded-3xl max-w-2xl w-full mx-4 max-h-[85vh] shadow-2xl border border-white/30 dark:border-gray-700 flex flex-col">
+      <div class="flex justify-between items-center p-6 border-b border-zinc-200/70 dark:border-gray-700">
+        <h3 class="text-2xl font-semibold text-zinc-800 dark:text-white flex items-center gap-2"><i class="fa-regular fa-rectangle-list text-emerald-600"></i> Your cart</h3>
+        <button onclick="closeCart()" class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-gray-700 hover:bg-zinc-200 dark:hover:bg-gray-600 flex items-center justify-center text-zinc-600 dark:text-zinc-300 text-xl transition">&times;</button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <div class="bg-emerald-50/50 dark:bg-gray-700/50 rounded-2xl p-5 border border-emerald-100/60 dark:border-gray-600 space-y-4">
+          <h4 class="text-sm font-semibold text-emerald-800 dark:text-emerald-400 tracking-wide flex items-center gap-2"><i class="fa-regular fa-circle-check"></i> Delivery details</h4>
+          <input id="customer-name" type="text" placeholder="Full name *" required class="w-full p-3 bg-white dark:bg-gray-800 border border-zinc-200 dark:border-gray-600 rounded-xl focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition">
+          <input id="customer-phone" type="tel" placeholder="Phone number (e.g. 0788......) *" required class="w-full p-3 bg-white dark:bg-gray-800 border border-zinc-200 dark:border-gray-600 rounded-xl focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition">
+          <textarea id="delivery-notes" rows="2" placeholder="Delivery address in Kigali / special notes" class="w-full p-3 bg-white dark:bg-gray-800 border border-zinc-200 dark:border-gray-600 rounded-xl focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition resize-none"></textarea>
+        </div>
+        <div id="cart-items" class="space-y-5 divide-y divide-zinc-100 dark:divide-gray-700"></div>
+      </div>
+      <div class="border-t border-zinc-200/70 dark:border-gray-700 p-6 bg-zinc-50/90 dark:bg-gray-800/90 rounded-b-3xl">
+        <div class="flex items-center justify-between text-lg font-semibold text-zinc-800 dark:text-white mb-4">
+          <span>Total amount</span>
+          <span id="cart-total" class="text-2xl font-bold text-emerald-800 dark:text-emerald-400">0 RWF</span>
+        </div>
+        <button onclick="proceedToCheckout()" class="w-full bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-3 shadow-md shadow-emerald-900/20">
+          <i class="fa-brands fa-whatsapp text-xl"></i> Send order via WhatsApp
+        </button>
+        <p class="text-xs text-center text-zinc-500 dark:text-zinc-400 mt-3">You'll be redirected to WhatsApp to confirm</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== AI ASSISTANT SIDEBAR ========== -->
+  <div id="ai-sidebar" class="rounded-l-3xl shadow-2xl">
+    <div class="p-5 border-b border-zinc-200/70 dark:border-gray-700 flex justify-between items-center bg-emerald-50/50 dark:bg-gray-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xl">🤖</div>
+        <div>
+          <h3 class="font-semibold text-zinc-800 dark:text-white">MedStock AI</h3>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">Ask me anything</p>
+        </div>
+      </div>
+      <button onclick="toggleAI()" class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-gray-700 hover:bg-zinc-300 dark:hover:bg-gray-600 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+    <div id="ai-chat-messages" class="flex-1 overflow-y-auto p-5 space-y-3 flex flex-col">
+      <div class="chat-msg chat-msg-bot">👋 Hi! I'm your assistant. How can I help you use MedStock?</div>
+      <div class="chat-msg chat-msg-bot">Try asking: "How to add to cart?", "How to search?", "How to order?"</div>
+    </div>
+    <div class="p-4 border-t border-zinc-200/70 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50">
+      <div class="flex gap-2">
+        <input id="ai-input" type="text" placeholder="Type your question..." class="flex-1 p-3 bg-white dark:bg-gray-800 border border-zinc-200 dark:border-gray-600 rounded-xl focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
+        <button onclick="sendAI()" class="w-12 h-12 bg-emerald-600 hover:bg-emerald-700 rounded-xl text-white flex items-center justify-center text-xl transition">
+          <i class="fa-regular fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI toggle button -->
+  <div id="ai-toggle" onclick="toggleAI()">
+    <i class="fa-regular fa-comment-dots"></i>
+  </div>
+
+  <!-- floating live badge for mobile -->
+  <div class="fixed bottom-5 left-5 sm:hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg text-xs font-medium flex items-center gap-2 border border-emerald-200 dark:border-gray-700">
+    <span class="live-dot w-2 h-2 bg-emerald-600 rounded-full"></span> live stock
+  </div>
+
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // Initialize Swiper
+    const swiper = new Swiper('.mySwiper', {
+      slidesPerView: 1,
+      spaceBetween: 30,
+      loop: true,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+    });
+
+    // ========== DETAIL MODAL FUNCTIONALITY ==========
+    let currentDetailItem = null;
+
+    function openDetailModal(id, name, unit, stock, price, buyingPrice, icon) {
+      currentDetailItem = { id, name, unit, stock, price, buyingPrice, icon };
+      
+      // Set modal content
+      document.getElementById('detail-name').textContent = name;
+      document.getElementById('detail-unit').textContent = unit;
+      document.getElementById('detail-price').textContent = price.toLocaleString('en-RW') + ' RWF';
+      document.getElementById('detail-stock').textContent = stock;
+      document.getElementById('desc-name').textContent = name;
+      document.getElementById('mech-name').textContent = name;
+      
+      // Set stock badge
+      const badge = document.getElementById('detail-stock-badge');
+      if (stock === 0) {
+        badge.textContent = 'Out of Stock';
+        badge.className = 'rounded-full px-4 py-2 text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+      } else if (stock < 80) {
+        badge.textContent = 'Low Stock';
+        badge.className = 'rounded-full px-4 py-2 text-sm font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+      } else {
+        badge.textContent = 'In Stock';
+        badge.className = 'rounded-full px-4 py-2 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+      }
+      
+      // Set image based on item type
+      const imageMap = {
+        'paracetamol': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        'gloves': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        'syringe': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      };
+      const defaultImage = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+      document.getElementById('detail-image').src = defaultImage;
+      
+      // Show modal
+      document.getElementById('detail-modal').classList.remove('hidden');
+      
+      // Reset tabs
+      showTab('description');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const tab = this.dataset.tab;
+        showTab(tab);
+      });
+    });
+
+    function showTab(tabName) {
+      // Update active tab
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabName) {
+          btn.classList.add('active', 'text-emerald-600', 'dark:text-emerald-400', 'border-b-2', 'border-emerald-600');
+          btn.classList.remove('text-zinc-500', 'dark:text-zinc-400');
+        } else {
+          btn.classList.remove('active', 'text-emerald-600', 'dark:text-emerald-400', 'border-b-2', 'border-emerald-600');
+          btn.classList.add('text-zinc-500', 'dark:text-zinc-400');
+        }
+      });
+      
+      // Show corresponding content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    }
+
+    // Add to cart from modal
+    document.getElementById('modal-add-to-cart').addEventListener('click', function() {
+      if (currentDetailItem && currentDetailItem.stock > 0) {
+        addToCart(currentDetailItem.id, currentDetailItem.name, currentDetailItem.price, currentDetailItem.unit);
+        closeDetailModal();
+      } else {
+        showToast('This item is out of stock');
+      }
+    });
+
+    // ========== CART FUNCTIONALITY ==========
+    let cart = JSON.parse(localStorage.getItem('medstock_cart')) || [];
+
+    function saveCart() {
+      localStorage.setItem('medstock_cart', JSON.stringify(cart));
+      updateCartCount();
+    }
+
+    function updateCartCount() {
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById('cart-count');
+      badge.textContent = count;
+      badge.classList.toggle('hidden', count === 0);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const msgSpan = document.getElementById('toast-message');
+      msgSpan.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function addToCart(id, name, price, unit) {
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ id, name, price: parseFloat(price), unit, quantity: 1 });
+      }
+      saveCart();
+      showToast(`✅ ${name} added to cart`);
+    }
+
+    function changeQuantity(index, delta) {
+      cart[index].quantity += delta;
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+      }
+      saveCart();
+      renderCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items');
+      container.innerHTML = '';
+
+      if (cart.length === 0) {
+        container.innerHTML = '<div class="text-center py-12 text-zinc-400"><i class="fa-regular fa-basket-shopping text-5xl mb-3 opacity-40"></i><p>Your cart feels lonely</p></div>';
+        document.getElementById('cart-total').textContent = '0 RWF';
+        return;
+      }
+
+      let grandTotal = 0;
+      cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        grandTotal += itemTotal;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex flex-wrap sm:flex-nowrap gap-3 items-center py-3';
+        itemDiv.innerHTML = `
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-zinc-800 dark:text-white truncate">${item.name}</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">${item.price.toLocaleString('en-RW')} RWF / ${item.unit}</p>
+          </div>
+          <div class="flex items-center gap-2 bg-zinc-100 dark:bg-gray-700 rounded-full px-2 py-1">
+            <button onclick="changeQuantity(${index}, -1)" class="w-7 h-7 rounded-full bg-white dark:bg-gray-600 shadow-sm text-zinc-700 dark:text-zinc-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 transition">−</button>
+            <span class="w-8 text-center font-medium dark:text-white">${item.quantity}</span>
+            <button onclick="changeQuantity(${index}, 1)" class="w-7 h-7 rounded-full bg-white dark:bg-gray-600 shadow-sm text-zinc-700 dark:text-zinc-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 transition">+</button>
+          </div>
+          <span class="font-bold text-emerald-700 dark:text-emerald-400 w-20 text-right">${itemTotal.toLocaleString('en-RW')} <span class="text-xs">RWF</span></span>
+          <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 transition ml-1" title="remove">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
+        `;
+        container.appendChild(itemDiv);
+      });
+
+      document.getElementById('cart-total').textContent = `${grandTotal.toLocaleString('en-RW')} RWF`;
+    }
+
+    function getCartMessage() {
+      const name = document.getElementById('customer-name')?.value.trim() || 'Customer';
+      const phone = document.getElementById('customer-phone')?.value.trim() || '';
+      const notes = document.getElementById('delivery-notes')?.value.trim() || '';
+
+      let message = `Hello MedStock Team!\n\nNew order from: ${name}\n`;
+      if (phone) message += `Phone: ${phone}\n`;
+      message += `\nOrder details:\n`;
+      let total = 0;
+      cart.forEach(item => {
+        const lineTotal = item.price * item.quantity;
+        total += lineTotal;
+        message += `• ${item.name} × ${item.quantity} ${item.unit} = ${lineTotal.toLocaleString('en-RW')} RWF\n`;
+      });
+      message += `\nTotal amount: ${total.toLocaleString('en-RW')} RWF\n\n`;
+      if (notes) message += `Delivery / notes: ${notes}\n\n`;
+      message += `Please confirm stock & delivery. Thank you!`;
+      return encodeURIComponent(message);
+    }
+
+    function proceedToCheckout() {
+      if (cart.length === 0) {
+        showToast("Your cart is empty!");
+        return;
+      }
+      const nameInput = document.getElementById('customer-name');
+      const phoneInput = document.getElementById('customer-phone');
+      if (!nameInput.value.trim() || !phoneInput.value.trim()) {
+        showToast("Please fill in your name and phone number.");
+        return;
+      }
+
+      const phoneNumber = "+250788665474";
+      const waLink = `https://wa.me/${phoneNumber}?text=${getCartMessage()}`;
+      window.open(waLink, '_blank');
+    }
+
+    function openCart() {
+      renderCart();
+      document.getElementById('cart-modal').classList.remove('hidden');
+    }
+
+    function closeCart() {
+      document.getElementById('cart-modal').classList.add('hidden');
+    }
+
+    function filterItems() {
+      const term = document.getElementById("search").value.toLowerCase().trim();
+      const cards = document.querySelectorAll("#grid > div.card-transition");
+      cards.forEach(card => {
+        const name = card.dataset.name || '';
+        card.style.display = name.includes(term) ? '' : 'none';
+      });
+    }
+
+    // ========== THEME TOGGLE ==========
+    function setTheme(theme) {
+      const body = document.body;
+      const icon = document.getElementById('theme-icon');
+      if (theme === 'dark') {
+        body.classList.add('dark');
+        icon.className = 'fa-solid fa-sun';
+      } else {
+        body.classList.remove('dark');
+        icon.className = 'fa-solid fa-moon';
+      }
+      localStorage.setItem('medstock_theme', theme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    }
+
+    (function initTheme() {
+      const saved = localStorage.getItem('medstock_theme');
+      if (saved === 'dark') setTheme('dark');
+      else setTheme('light');
+    })();
+
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+    // ========== AI SIDEBAR ==========
+    function toggleAI() {
+      document.getElementById('ai-sidebar').classList.toggle('open');
+    }
+
+    function sendAI() {
+      const input = document.getElementById('ai-input');
+      const question = input.value.trim().toLowerCase();
+      if (!question) return;
+
+      const messages = document.getElementById('ai-chat-messages');
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-msg chat-msg-user';
+      userMsg.textContent = input.value;
+      messages.appendChild(userMsg);
+
+      let reply = "I'm not sure. Try asking about 'add to cart', 'search', 'order', or 'what is this site'.";
+      if (question.includes('add to cart') || question.includes('how to add')) {
+        reply = "To add an item to your cart, simply click the 'Add to cart' button on any product card. You can then open the cart (top right icon) to adjust quantities or proceed.";
+      } else if (question.includes('search')) {
+        reply = "Use the search bar at the top of the page to filter items by name. Just start typing and the grid updates automatically.";
+      } else if (question.includes('order') || question.includes('checkout')) {
+        reply = "After adding items, open your cart, fill in your name and phone number, then click 'Send order via WhatsApp'. You'll be redirected to WhatsApp with your order summary.";
+      } else if (question.includes('what is this') || question.includes('about')) {
+        reply = "MedStock is a live pharmacy inventory platform in Kigali. You can see real-time stock, add items to cart, and order via WhatsApp.";
+      } else if (question.includes('price') || question.includes('cost')) {
+        reply = "Prices are shown on each product card in RWF. The total is calculated in your cart.";
+      } else if (question.includes('dark mode') || question.includes('light mode')) {
+        reply = "You can toggle dark/light mode using the sun/moon button in the top bar.";
+      } else if (question.includes('medicine detail') || question.includes('how to see details')) {
+        reply = "Click on any product card (image or name) to open a detailed modal with usage instructions and how the medicine works.";
+      }
+
+      setTimeout(() => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'chat-msg chat-msg-bot';
+        botMsg.textContent = reply;
+        messages.appendChild(botMsg);
+        messages.scrollTop = messages.scrollHeight;
+      }, 300);
+
+      input.value = '';
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    document.getElementById('ai-input')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendAI();
+    });
+
+    document.getElementById('cart-btn').addEventListener('click', openCart);
+    window.addEventListener('load', () => {
+      updateCartCount();
+      document.getElementById("search")?.focus();
+    });
+    document.getElementById('cart-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeCart();
+    });
+    
+    // Close detail modal when clicking outside
+    document.getElementById('detail-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeDetailModal();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<div class="modern-table-container">
+    <div class="table-responsive">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th class="text-center">Current Stock</th>
+                    <th class="text-center">Stock In</th>
+                    <th class="text-center">Stock Out</th>
+                    <th class="text-end">Buy Price</th>
+                    <th class="text-end">Sell Price</th>
+                    <th class="text-end">Profit</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if items %}
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon me-3" style="width: 40px; height: 40px; font-size: 1rem; margin-bottom: 0;">
+                                    <i class="bi bi-box"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ item.name }}</div>
+                                    <small class="text-muted">ID: #{{ item.id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="stock-badge {% if item.current_stock < 10 %}stock-low{% elif item.current_stock == 0 %}stock-zero{% endif %}">
+                                {{ item.current_stock }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="movement-badge movement-in">
+                                <i class="bi bi-arrow-down-circle"></i>
+                                <span class="movement-count">{{ item.total_stock_in() }}</span>
+                                <small class="movement-label">units in</small>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="movement-badge movement-out">
+                                <i class="bi bi-arrow-up-circle"></i>
+                                <span class="movement-count">{{ item.total_stock_out() }}</span>
+                                <small class="movement-label">units out</small>
+                            </div>
+                        </td>
+                        <td class="text-end price-tag">₱{{ "%.2f"|format(item.unit_buying_price) }}</td>
+                        <td class="text-end price-tag">₱{{ "%.2f"|format(item.unit_selling_price) }}</td>
+                        <td class="text-end">
+                            <span class="profit-badge {% if item.profit() >= 0 %}profit-positive{% else %}profit-negative{% endif %}">
+                                <i class="bi {% if item.profit() >= 0 %}bi-arrow-up{% else %}bi-arrow-down{% endif %} me-1"></i>
+                                ₱{{ "%.2f"|format(item.profit()) }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-group">
+                                <a href="{{ url_for('stock_in', item_id=item.id) }}" 
+                                   class="btn-action btn-in" data-tooltip="Stock In">
+                                    <i class="bi bi-plus-lg"></i>
+                                </a>
+                                <a href="{{ url_for('stock_out', item_id=item.id) }}" 
+                                   class="btn-action btn-out" data-tooltip="Stock Out">
+                                    <i class="bi bi-dash-lg"></i>
+                                </a>
+                                <a href="{{ url_for('edit_item', item_id=item.id) }}" 
+                                   class="btn-action btn-edit" data-tooltip="Edit Item">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{{ url_for('delete_item', item_id=item.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" 
+                                            class="btn-action btn-delete" 
+                                            data-tooltip="Delete Item"
+                                            onclick="return confirm('Are you sure you want to delete {{ item.name }}? This action cannot be undone.');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox display-1 text-muted"></i>
+                                <h4 class="mt-3 text-muted">No items found</h4>
+                                {% if search %}
+                                <p class="text-muted">No results matching "{{ search }}"</p>
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-modern btn-add mt-3">
+                                    <i class="bi bi-arrow-left me-2"></i>Clear Search
+                                </a>
+                                {% else %}
+                                <p class="text-muted">Get started by adding your first item</p>
+                                <a href="{{ url_for('add_item') }}" class="btn btn-modern btn-add mt-3">
+                                    <i class="bi bi-plus-circle me-2"></i>Add New Item
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <div class="d-flex flex-column align-items-center mt-4">
+        <nav class="modern-pagination" aria-label="Dashboard pagination">
+            <ul class="pagination mb-0">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="#" data-page="{{ pagination.prev_num if pagination.has_prev else '' }}" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                {% for p in range(1, pagination.pages + 1) %}
+                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="#" data-page="{{ p }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="#" data-page="{{ pagination.next_num if pagination.has_next else '' }}" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="summary-info">
+            <span class="summary-item">
+                <span class="summary-dot"></span>
+                <span class="summary-text">Showing <strong>{{ items|length }}</strong> of <strong>{{ pagination.total }}</strong> items</span>
+            </span>
+            {% if search %}
+            <span class="summary-item">
+                <span class="summary-dot" style="background: var(--warning-gradient);"></span>
+                <span class="summary-text">Search: <strong>"{{ search }}"</strong></span>
+            </span>
+            {% endif %}
+            <span class="summary-item">
+                <span class="summary-dot" style="background: var(--success-gradient);"></span>
+                <span class="summary-text">Page <strong>{{ pagination.page }}</strong> of <strong>{{ pagination.pages }}</strong></span>
+            </span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.empty-state {
+    padding: 3rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #cbd5e0;
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.empty-state p {
+    color: #718096;
+}
+
+/* Movement Badges */
+.movement-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    min-width: 80px;
+}
+
+.movement-in {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+}
+
+.movement-out {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+}
+
+.movement-count {
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+
+.movement-label {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.movement-badge i {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+/* Animation for new items */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modern-table tbody tr {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .movement-badge {
+        min-width: 60px;
+        padding: 0.3rem 0.5rem;
+    }
+    
+    .movement-count {
+        font-size: 1rem;
+    }
+    
+    .movement-label {
+        font-size: 0.6rem;
+    }
+}
+</style>

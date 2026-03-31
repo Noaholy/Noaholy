@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <h2 class="fw-bold text-primary">
+        <i class="bi bi-clock-history me-2"></i>Transaction History
+    </h2>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back
+    </a>
+</div>
+
+<div class="card shadow-lg border-0 animate-on-load">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th class="text-center">Quantity</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if transactions %}
+                    {% for t in transactions %}
+                    <tr>
+                        <td class="fw-semibold">
+                            <i class="bi bi-calendar3 me-2 text-muted"></i>
+                            {{ t.transaction_date.strftime('%Y-%m-%d %H:%M:%S') }}
+                        </td>
+                        <td class="fw-semibold">{{ t.item.name }}</td>
+                        <td>
+                            {% if t.type == 'IN' %}
+                                <span class="badge bg-success"><i class="bi bi-arrow-down-circle me-1"></i>IN</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="bi bi-arrow-up-circle me-1"></i>OUT</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center fw-bold">{{ t.quantity }}</td>
+                        <td>{{ t.notes or '<span class="text-muted">—</span>' | safe }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="bi bi-archive fs-1 text-muted d-block mb-3"></i>
+                            <p class="text-muted fs-5">No transactions recorded yet</p>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

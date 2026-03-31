@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4 mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h4 class="mb-0"><i class="bi bi-shield-lock-fill me-2"></i>Sign In</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Username</label>
+                        <input type="text" name="username" class="form-control form-control-lg" required autofocus>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Password</label>
+                        <input type="password" name="password" class="form-control form-control-lg" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Login to Dashboard</button>
+                </form>
+
+                <!-- Divider with "or" -->
+                <div class="d-flex align-items-center my-4">
+                    <hr class="flex-grow-1">
+                    <span class="mx-3 text-muted small">or</span>
+                    <hr class="flex-grow-1">
+                </div>
+
+                <!-- Continue to Live Stock button (no login required) -->
+                <a href="{{ url_for('live_stock') }}" class="btn btn-outline-success btn-lg w-100">
+                    <i class="bi bi-camera-reels me-2"></i>Continue to Live Stock
+                </a>
+
+                <p class="text-center text-muted small mt-3">
+                    Live stock is public – no login needed.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
